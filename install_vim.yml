@@ -1,0 +1,4 @@
+- hosts: dev
+  tasks:
+   - name: Install vim
+     apt: pkg=vim state=latest update_cache=true
