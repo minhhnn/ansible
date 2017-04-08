@@ -1,0 +1,5 @@
+# Here are variables related to the JDK installation
+
+jdk_version: jdk1.8.0_121
+temp_dir: /tmp/jdk_download
+installation_dir: /opt

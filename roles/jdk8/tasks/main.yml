@@ -1,0 +1,28 @@
+- name: Delete temp directory if exists
+  file: path={{ temp_dir }} state=absent
+
+- name: Create temp directory
+  file: path={{ temp_dir }} state=directory
+
+- name: Copy setenv.sh from control machine to target machine (to temp directory)
+  copy: src=setenv.sh dest=/etc/init.d/setenv.sh mode=0755
+  register: setenv_copied_from_controller
+
+- name: Copy jdk from control machine to target machine (to temp directory)
+  copy: src=jdk1.8.0_121.tar.gz dest={{ temp_dir }}
+  when: setenv_copied_from_controller | success
+  register: jdk_copied_from_controller
+
+- name: Extract jdk jar
+  command: /bin/tar -xf {{ temp_dir }}/{{ jdk_version }}.tar.gz
+  when: jdk_copied_from_controller | success
+  register: jdk_extracted
+  args:
+    chdir: "{{ temp_dir }}"
+
+- name: Copy jdk to installation_dir
+  command: /bin/mv {{ temp_dir }}/{{ jdk_version }} {{ installation_dir }}
+  when: jdk_extracted | success
+
+- name: Delete temp directory when finished
+  file: path={{ temp_dir }} state=absent
