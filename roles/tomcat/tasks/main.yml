@@ -1,0 +1,36 @@
+- name: Delete temp directory if exists
+  file: path={{ temp_dir }} state=absent
+
+- name: Create temp directory
+  file: path={{ temp_dir }} state=directory
+
+- name: Download tomcat jar to temp directory
+  get_url: url={{ tomcat_download_url }} dest={{ temp_dir }}/tomcat.tar.gz
+  register: tomcat_downloaded
+
+- name: Extract tomcat jar
+  command: /bin/tar -xf {{ temp_dir }}/tomcat.tar.gz
+  when: tomcat_downloaded | success
+  register: tomcat_extracted
+  args:
+    chdir: "{{ temp_dir }}"
+
+- name: Copy tomcat to installation_dir
+  command: /bin/mv {{ temp_dir }}/apache-tomcat-8.5.13 {{ installation_dir }}
+  register: tomcat_extracted | changed
+
+- name: Configure tomcat-user
+  template: src=tomcat-users.xml dest={{ installation_dir }}/apache-tomcat-8.5.13/conf/
+  register: tomcat_installed | changed 
+
+- name: Copy tomcat init script
+  copy: src=tomcat_initscript.sh dest=/etc/init.d/tomcat mode=0755
+
+#- name: Start tomcat
+#  command: /etc/init.d/tomcat start
+
+#- name: wait for tomcat to start
+#  wait_for: port="{{ http_port }}" delay=10
+
+- name: Delete temp directory when finished
+  file: path={{ temp_dir }} state=absent

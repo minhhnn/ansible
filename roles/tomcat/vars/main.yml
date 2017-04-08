@@ -1,0 +1,13 @@
+# Here are variables related to the Tomcat installation
+
+tomcat_download_url: http://apache.mirror.serversaustralia.com.au/tomcat/tomcat-8/v8.5.13/bin/apache-tomcat-8.5.13.tar.gz
+temp_dir: /tmp/tomcat_download
+installation_dir: /opt
+
+# Tomcat port
+http_port: 8080
+
+# This will configure a default manager-gui user:
+
+tomcat_username: tomcat
+tomcat_password: tomcat
